@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -34,7 +35,7 @@ func main() {
 
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenStr := c.Request.Header.Get("token")
+		tokenStr := strings.TrimPrefix(c.Request.Header.Get("Authorization"), "Bearer ")
 		claims := jwt.RegisteredClaims{}
 		token, err := jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
 			// Don't forget to validate the alg is what you expect:

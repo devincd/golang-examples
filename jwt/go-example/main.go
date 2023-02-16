@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -75,7 +76,7 @@ func LoginHandle(writer http.ResponseWriter, request *http.Request) {
 func AuthRequiredMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		DebugPrint("this is AuthRequiredMiddleware")
-		claims, err := ValidJWT(request.Header.Get("token"))
+		claims, err := ValidJWT(strings.TrimPrefix(request.Header.Get("Authorization"), "Bearer "))
 		if err != nil {
 			ResponseWithJSON(writer, http.StatusUnauthorized, fmt.Sprintf("Access Deny, Reason:%v", err))
 			return
@@ -88,7 +89,7 @@ func AuthRequiredMiddleware(next http.Handler) http.Handler {
 func AuthRequiredMiddleware2(next http.HandlerFunc) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		DebugPrint("this is AuthRequiredMiddleware2")
-		claims, err := ValidJWT(request.Header.Get("token"))
+		claims, err := ValidJWT(strings.TrimPrefix(request.Header.Get("Authorization"), "Bearer "))
 		if err != nil {
 			ResponseWithJSON(writer, http.StatusUnauthorized, fmt.Sprintf("Access Deny, Reason:%v", err))
 			return
